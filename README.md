@@ -11,6 +11,39 @@ BLLMA Lab final presentation · RWTH Aachen University, Chair of Databases and I
 
 [![Title slide of the DIAOS final presentation](preview/slide-01-title.png)](https://ds-prasad.github.io/bllma-diaos-final-presentation/DIAOS_Final_Presentation.html)
 
+## My role
+
+**Built three research tools** (the bibliography-audit path in Part 1)
+- `pdf_reference_resolver`: extracts a paper's bibliography and resolves each entry to a DOI or arXiv id with a
+  confidence level, via Crossref, OpenAlex and Semantic Scholar. Unresolved entries stay visible instead of disappearing.
+- `reference_quality_checker`: flags retractions, corrections, duplicates and outdated references, and grades
+  bibliography health. Resolver coverage is reported separately, so our own blind spots never count against the paper.
+- `preprint_publication_matcher`: matches cited arXiv preprints to their peer-reviewed versions.
+  12/12 on a hand-verified benchmark, published recall 8/8, zero false "published".
+
+**Fixed two major silent failures**
+- **Summarizer hallucination.** The tools reported honestly, but the final summary dropped their caveats, mixed numbers
+  across tools and described the planner's intentions as work done. I instrumented the tool-to-LLM boundary, built
+  six detectors *before* the fix, then rewrote the summarizer prompt as eight evidence rules
+  (one file, +39 −9 lines, no logic changed). Wrong-claim rate **38% → 9%**, unsupported claims **6 → 0**,
+  distortion flags **4 → 0**.
+- **Retraction detection that found nothing.** The checker read the wrong end of Crossref's retraction relation, so it
+  could never flag a cited original. It now reads both relations, plus OpenAlex `is_retracted` as an independent
+  second source: 7/7 on a 22-reference benchmark, retraction recall 2/2, zero new test failures.
+
+**Fixed two minor ones**
+- **A registered tool the router never chose.** Runtime checks proved the wiring was fine. The cause was planner bias
+  plus a hard-coded "search arXiv first" instruction, which I replaced with a deterministic short-circuit. Along the way
+  I found that instruction re-ran on every iteration, making normal queries repeat the arXiv search 6–7 times, and
+  made it iteration-aware.
+- **Nondeterministic results.** Semantic Scholar rate limits were silently read as "no evidence". I added retries
+  that honour `Retry-After` and an arXiv-based rescue chain, and verified the fix live during an outage.
+
+I also designed and built this deck end to end, and presented incidents ① and ② in the talk.
+
+Team project with **Seif Fathy** and **Leon Drvoderic**: they built the other six Part 1 tools, and each slide
+credits the tool's creator. Seif presented the Part 2 opening and incident ③.
+
 ## What it covers
 
 DIAOS (Durable Industrial Agent Orchestration System) is an AI research agent built on Temporal workflows.
@@ -21,29 +54,12 @@ Every step is recorded, retryable and inspectable.
   acquire and structure papers, connect claims to evidence, and audit bibliographies. The part ends with a recorded end-to-end run.
 - **Part 2 · Bottlenecks, blockers & fixes.** Four incidents, and not one of them produced a crash, an exception or a red test.
   Each is walked through as *observe → isolate → measure → fix → prove*.
-  - **Summarizer hallucination.** The tools reported correctly, but the summary invented methodology and dropped caveats.
-    We built six detectors *before* writing the fix. The fix itself was eight evidence rules in one prompt string
-    (+39 −9 lines, no logic changes). The wrong-claim rate fell from **38% to 9%**, and distortion flags from **4 to 0**.
-  - **Retraction detection that found nothing.** It read the wrong end of the Crossref update relation. The fix reads
-    both ends and adds OpenAlex as a second source. It scored 7/7 on a 22-reference benchmark, with no new test failures.
 - **Appendix.** Known issues, the detector catalogue, a gallery of real captures, and how every number was derived.
 
 <p>
   <img src="preview/slide-09-bibliography-audit-tools.png" width="49%" alt="Slide 9: a bibliography becomes an auditable reference set">
   <img src="preview/slide-16-honest-tools-unfaithful-summary.png" width="49%" alt="Slide 16: honest tools, unfaithful summary">
 </p>
-
-## My role
-
-- **Designed and built the deck end to end.** It is one self-contained HTML file with no build step or dependencies.
-  It has a clickable tree-map outline, speaker notes, deep links, a fullscreen present mode, and a print stylesheet for the PDF.
-- **Wrote and presented the core of Part 2:** incidents ① summarizer hallucination and ② retraction detection,
-  plus the closing slides and the appendix.
-- **Built the three bibliography-audit tools** shown in Part 1: `pdf_reference_resolver`, `reference_quality_checker`
-  and `preprint_publication_matcher`.
-
-This was a team project with **Seif Fathy** and **Leon Drvoderic**. They built the other six Part 1 tools and their slides,
-and each slide credits the tool's creator. Seif also presented the Part 2 opening and incident ③.
 
 ## Viewing
 
