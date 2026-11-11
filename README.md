@@ -1,0 +1,70 @@
+# DIAOS · Final Presentation
+
+**Finding the failures that never crash.** A 41-slide technical talk on a durable AI research agent:
+the tools we built on it, and how four silent failures were found, measured, fixed and proven.
+
+BLLMA Lab final presentation · RWTH Aachen University, Chair of Databases and Information Systems (i5) · 31 August 2026
+
+**[▶ View the deck live](https://ds-prasad.github.io/bllma-diaos-final-presentation/DIAOS_Final_Presentation.html)** ·
+**[PDF](DIAOS_Final_Presentation.pdf)** ·
+**[Demo video (69 s)](DIAOS_Live_Demo.mp4)**
+
+[![Title slide of the DIAOS final presentation](preview/slide-01-title.png)](https://ds-prasad.github.io/bllma-diaos-final-presentation/DIAOS_Final_Presentation.html)
+
+## What it covers
+
+DIAOS (Durable Industrial Agent Orchestration System) is an AI research agent built on Temporal workflows.
+An LLM plans the research request, then routes it to tools over several iterations and summarizes the results.
+Every step is recorded, retryable and inspectable.
+
+- **Part 1 · Tools implemented.** Nine research tools were added to the 12-tool baseline, in three paths:
+  acquire and structure papers, connect claims to evidence, and audit bibliographies. The part ends with a recorded end-to-end run.
+- **Part 2 · Bottlenecks, blockers & fixes.** Four incidents, and not one of them produced a crash, an exception or a red test.
+  Each is walked through as *observe → isolate → measure → fix → prove*.
+  - **Summarizer hallucination.** The tools reported correctly, but the summary invented methodology and dropped caveats.
+    We built six detectors *before* writing the fix. The fix itself was eight evidence rules in one prompt string
+    (+39 −9 lines, no logic changes). The wrong-claim rate fell from **38% to 9%**, and distortion flags from **4 to 0**.
+  - **Retraction detection that found nothing.** It read the wrong end of the Crossref update relation. The fix reads
+    both ends and adds OpenAlex as a second source. It scored 7/7 on a 22-reference benchmark, with no new test failures.
+- **Appendix.** Known issues, the detector catalogue, a gallery of real captures, and how every number was derived.
+
+<p>
+  <img src="preview/slide-09-bibliography-audit-tools.png" width="49%" alt="Slide 9: a bibliography becomes an auditable reference set">
+  <img src="preview/slide-16-honest-tools-unfaithful-summary.png" width="49%" alt="Slide 16: honest tools, unfaithful summary">
+</p>
+
+## My role
+
+- **Designed and built the deck end to end.** It is one self-contained HTML file with no build step or dependencies.
+  It has a clickable tree-map outline, speaker notes, deep links, a fullscreen present mode, and a print stylesheet for the PDF.
+- **Wrote and presented the core of Part 2:** incidents ① summarizer hallucination and ② retraction detection,
+  plus the closing slides and the appendix.
+- **Built the three bibliography-audit tools** shown in Part 1: `pdf_reference_resolver`, `reference_quality_checker`
+  and `preprint_publication_matcher`.
+
+This was a team project with **Seif Fathy** and **Leon Drvoderic**. They built the other six Part 1 tools and their slides,
+and each slide credits the tool's creator. Seif also presented the Part 2 opening and incident ③.
+
+## Viewing
+
+Open the [live deck](https://ds-prasad.github.io/bllma-diaos-final-presentation/DIAOS_Final_Presentation.html).
+For an offline copy, download `DIAOS_Final_Presentation.html` together with `figures/` and open it in any modern browser.
+
+| Key | Action |
+| --- | --- |
+| `→` `Space` / `←` | Next / previous slide |
+| `Home` / `End` | First / last slide |
+| `F` | Fullscreen present mode (`Esc` to leave) |
+| `N` | Speaker notes |
+
+To open a specific slide, add `#s16` to the URL. Add `#s16,present` to open that slide fullscreen.
+
+## Contents
+
+| Path | What it is |
+| --- | --- |
+| `DIAOS_Final_Presentation.html` | The deck: 41 slides, 16:9, one self-contained file |
+| `DIAOS_Final_Presentation.pdf` | PDF export with selectable text, one slide per page |
+| `DIAOS_Live_Demo.mp4` | Recorded end-to-end run on *Attention Is All You Need* (69 s, 1280×720) |
+| `figures/` | Slide media: `S01-` tools, `S02-` incident screenshots, `S03-` appendix captures |
+| `preview/` | Slide renders used in this README |
